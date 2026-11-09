@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shop</title>
+  <link rel="stylesheet" href="/shop.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="s-head">
+    <div class="s-logo"><div class="logo-icon">🛍️</div><h1 id="s-name"></h1></div>
+  </header>
+
+  <div id="state" class="state">Shop khul rahi hai...</div>
+
+  <div id="shop" class="hidden">
+    <input id="s-search" class="search" type="search" placeholder="Search products...">
+
+    <section class="hero">
+      <div>
+        <h2 id="h-name"></h2>
+        <p>Pasand ka product chuno aur "Order Now" dabao</p>
+        <span class="dchip" id="h-deliv"></span>
+      </div>
+      <div class="hero-img">🛍️</div>
+    </section>
+
+    <div class="cats" id="cats"></div>
+
+    <div class="sec-head"><h3>Products</h3></div>
+    <div class="products" id="products"></div>
+
+    <section class="track">
+      <div class="track-icon">📦</div>
+      <div class="track-body">
+        <b>Apna Order Track Karo</b>
+        <div class="track-form">
+          <input id="t-no" type="text" placeholder="Order ID (jaise ORD1A2B3C4)">
+          <input id="t-ph" type="tel" inputmode="numeric" placeholder="Order mein daala phone number">
+          <button id="t-btn" type="button">🔍 Track Order</button>
+        </div>
+        <div id="t-out" class="t-out hidden"></div>
+      </div>
+    </section>
+
+    <footer class="foot">Powered by ShopKart</footer>
+  </div>
+</div>
+
+<div id="modal" class="modal hidden"></div>
+<div id="toast" class="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/config.js"></script>
+<script src="/shop.js"></script>
+</body>
+</html>
+
