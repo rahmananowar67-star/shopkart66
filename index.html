@@ -1,1 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ShopKart - Shop Owner</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<!-- ============ SETUP BAAKI (config.js khali) ============ -->
+<section id="setup" class="auth hidden">
+  <div class="auth-card">
+    <h2>Setup baaki hai</h2>
+    <p class="note">config.js mein Supabase URL aur anon key daalo. Steps SETUP.md mein likhe hain.</p>
+  </div>
+</section>
+
+<!-- ============ LOGIN / SIGNUP ============ -->
+<section id="auth" class="auth hidden">
+  <div class="auth-card">
+    <div class="logo dark">
+      <div class="logo-icon">🛍️</div>
+      <div><h1>Shop<span>Kart</span></h1><small>Apni online dukaan banao</small></div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="login" type="button">Login</button>
+      <button class="tab" data-tab="signup" type="button">Naya Account</button>
+    </div>
+
+    <p id="auth-msg" class="msg hidden"></p>
+
+    <form id="form-login">
+      <label>Email</label>
+      <input name="email" type="email" autocomplete="email" required>
+      <label>Password</label>
+      <input name="password" type="password" autocomplete="current-password" required>
+      <button class="btn block" type="submit">Login</button>
+    </form>
+
+    <form id="form-signup" class="hidden">
+      <label>Email</label>
+      <input name="email" type="email" autocomplete="email" required>
+      <label>Password (kam se kam 6 akshar)</label>
+      <input name="password" type="password" autocomplete="new-password" minlength="6" required>
+      <label>Shop ka naam</label>
+      <input name="shop_name" type="text" maxlength="40" required>
+      <label>Business number (WhatsApp)</label>
+      <input name="whatsapp" type="tel" inputmode="numeric" placeholder="10 digit number" required>
+      <small>Naye order is number par WhatsApp se aayenge.</small>
+      <button class="btn block" type="submit">Account banao</button>
+    </form>
+  </div>
+</section>
+
+<!-- ============ OWNER APP ============ -->
+<div id="app" class="app hidden">
+
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-icon">🛍️</div>
+      <div><h1>Shop<span>Kart</span></h1><small>Shop Smart, Live Better</small></div>
+    </div>
+
+    <nav class="menu">
+      <a data-view="dashboard">🏠 Dashboard</a>
+      <a data-view="products">📦 Products</a>
+      <a data-view="orders">📋 Orders <span class="pill hidden" id="orders-pill">0</span></a>
+      <a data-view="settings">⚙️ Settings</a>
+      <a class="shoplink" data-act="open-shop">🛒 View My Shop</a>
+    </nav>
+
+    <div class="logout" data-act="logout">🚪 Logout</div>
+  </aside>
+
+  <div class="right">
+    <header class="topbar">
+      <div class="logo mobile-only"><div class="logo-icon">🛍️</div></div>
+      <div class="shopname" id="shopname"></div>
+      <span class="spacer"></span>
+      <button class="icon-btn" id="theme" type="button">☀️</button>
+      <button class="icon-btn" data-act="bell" type="button">🔔<span class="badge hidden" id="bell-badge">0</span></button>
+    </header>
+
+    <main class="main">
+
+      <!-- ---------- DASHBOARD ---------- -->
+      <section id="view-dashboard" class="view">
+        <div class="banner">
+          <div>
+            <h2>Shop Owner Dashboard</h2>
+            <p id="hello">Manage your store in one place</p>
+          </div>
+        </div>
+
+        <div class="linkbar" id="linkbar-dash"></div>
+
+        <div class="stats" id="stats"></div>
+
+        <div class="row">
+          <div class="card sales">
+            <div class="card-head">
+              <h3>Sales Overview</h3>
+              <select id="range"><option value="30">Last 30 Days</option><option value="7">Last 7 Days</option></select>
+            </div>
+            <div class="chart">
+              <div class="tooltip" id="tooltip"></div>
+              <canvas id="salesChart"></canvas>
+              <div class="chart-empty hidden" id="chart-empty">Abhi koi sale nahi hui</div>
+            </div>
+            <div class="x-axis" id="x-axis"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><h3>Recent Orders</h3><a class="more" data-view="orders">View All →</a></div>
+            <div id="recent-orders"></div>
+          </div>
+        </div>
+
+        <div class="row two">
+          <div class="card">
+            <div class="card-head"><h3>Top Products</h3><a class="more" data-view="products">View All →</a></div>
+            <div id="top-products"></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>⚠️ Low Stock Alert</h3></div>
+            <div id="low-stock"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- PRODUCTS ---------- -->
+      <section id="view-products" class="view hidden">
+        <div class="page-head">
+          <h2>Products</h2>
+          <button class="btn gold" data-act="add-product" type="button">＋ Product Add</button>
+        </div>
+        <div class="linkbar" id="linkbar-prod"></div>
+        <div class="pgrid" id="products-grid"></div>
+      </section>
+
+      <!-- ---------- ORDERS ---------- -->
+      <section id="view-orders" class="view hidden">
+        <div class="page-head"><h2>Orders</h2></div>
+        <div class="chips" id="order-chips"></div>
+        <div id="orders-list"></div>
+      </section>
+
+      <!-- ---------- SETTINGS ---------- -->
+      <section id="view-settings" class="view hidden">
+        <div class="page-head"><h2>Settings</h2></div>
+        <div class="card">
+          <form id="form-settings">
+            <label>Shop ka naam</label>
+            <input name="name" maxlength="40" required>
+            <label>Business number (WhatsApp)</label>
+            <input name="whatsapp" type="tel" inputmode="numeric" required>
+            <label>UPI ID (online payment ke liye, optional)</label>
+            <input name="upi_id" placeholder="naam@upi" maxlength="60">
+            <small>Khali chhodoge to customer ko sirf Cash on Delivery dikhega.</small>
+            <label>Delivery mein kitne din lagenge</label>
+            <div class="two-col">
+              <input name="delivery_min" type="number" min="0" max="60" required>
+              <input name="delivery_max" type="number" min="0" max="60" required>
+            </div>
+            <small>Minimum aur maximum din. Ye customer ko dikhega.</small>
+            <button class="btn block" type="submit">Save karo</button>
+          </form>
+        </div>
+        <button class="btn danger block" data-act="logout" type="button">Logout</button>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Phone ke liye neeche ka menu -->
+  <nav class="bottomnav">
+    <a data-view="dashboard"><span>🏠</span>Home</a>
+    <a data-view="products"><span>📦</span>Products</a>
+    <a data-view="orders"><span>📋</span>Orders</a>
+    <a data-view="settings"><span>⚙️</span>Settings</a>
+    <a data-act="open-shop"><span>🛒</span>My Shop</a>
+  </nav>
+</div>
+
+<div id="modal" class="modal hidden"></div>
+<div id="toast" class="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/config.js"></script>
+<script src="/script.js"></script>
+</body>
+  </html>
 
