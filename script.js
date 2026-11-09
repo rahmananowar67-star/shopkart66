@@ -43,7 +43,7 @@
     return String(s).toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '').slice(0, 30) || 'shop';
   }
-  const shopUrl = () => location.origin + '/s/' + shop.slug;
+  const shopUrl = () => String(cfg.SITE_URL || location.origin).replace(/\/$/, '') + '/s/' + shop.slug;
   const prodById = id => products.find(p => p.id === id);
   const validOrders = () => orders.filter(o => o.status !== 'cancelled');
   function setBusy(form, on) {
