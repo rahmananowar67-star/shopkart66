@@ -212,4 +212,4 @@ a.btn{text-decoration:none}
 .planbar.soon{background:#fff3d6;color:#8a5a00}
 .planbar.end{background:#fde8e7;color:#b3261e}
 .planbar a{font-weight:700;text-decoration:underline}
-  
+  .install{border:0;background:var(--gold);color:#201400;font-weight:700;font-size:13px;padding:8px 12px;border-radius:18px;white-space:nowrap}
