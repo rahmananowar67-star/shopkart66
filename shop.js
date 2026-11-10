@@ -63,6 +63,7 @@
     if (s.error) { state('Shop abhi khul nahi paa rahi. Thodi der baad try karo.'); return; }
     if (!s.data) { state('Ye shop nahi mili 😕<br>Link check karo.'); return; }
     shop = s.data;
+    if (cfg.ENFORCE_PLAN && shop.plan_until && new Date(shop.plan_until) < new Date()) { state('Ye shop abhi band hai.<br>Thodi der baad dobara dekhna.'); return; }
     document.title = shop.name;
     $('#s-name').textContent = shop.name;
     $('#h-name').textContent = shop.name;
@@ -277,4 +278,4 @@
 
   init();
 })();
-      
+        
