@@ -7,6 +7,17 @@
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
+<script>
+  // Kuch gadbad ho to screen par wajah likhi aayegi (blank nahi dikhega)
+  function skErr(msg) {
+    var d = document.getElementById('sk-err');
+    if (!d) { d = document.createElement('div'); d.id = 'sk-err'; document.body.appendChild(d); }
+    d.style.cssText = 'position:fixed;left:12px;right:12px;bottom:12px;z-index:999;background:#fff;color:#b3261e;padding:12px;border-radius:10px;font:13px system-ui;box-shadow:0 4px 16px rgba(0,0,0,.4)';
+    d.textContent = 'Dikkat: ' + msg;
+  }
+  window.addEventListener('error', function (e) { skErr((e.message || 'file load nahi hui') + (e.filename ? ' (' + e.filename.split('/').pop() + ':' + e.lineno + ')' : '')); });
+  window.addEventListener('unhandledrejection', function (e) { skErr((e.reason && e.reason.message) || e.reason || 'unknown'); });
+</script>
 
 <!-- ============ SETUP BAAKI (config.js khali) ============ -->
 <section id="setup" class="auth hidden">
