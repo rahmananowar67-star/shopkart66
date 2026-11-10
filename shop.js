@@ -183,6 +183,7 @@
   }
 
   function success(o, c) {
+    saveOrder(o, c.phone);
     const lines = [
       '🛒 Naya Order #' + o.order_no,
       'Product: ' + o.product_name + ' × ' + o.qty,
@@ -210,21 +211,48 @@
       '<button class="abtn plain" data-close type="button">Aur shopping karo</button></div>');
   }
 
-  // ---------- track ----------
-  async function track() {
-    const no = $('#t-no').value.trim(), ph = $('#t-ph').value.trim();
-    const out = $('#t-out');
-    if (!no || ph.replace(/\D/g, '').length < 10) { toast('Order ID aur phone number dono daalo'); return; }
-    out.classList.remove('hidden');
-    out.textContent = 'Dhoondh rahe hain...';
+  // ---------- mere orders (is phone se kiye hue orders) ----------
+  const KEY = () => 'sk-orders-' + shop.slug;
+  function loadSaved() { try { return JSON.parse(localStorage.getItem(KEY()) || '[]'); } catch (e) { return []; } }
+  function storeSaved(list) { try { localStorage.setItem(KEY(), JSON.stringify(list.slice(0, 30))); } catch (e) {} }
+  function saveOrder(o, phone) {
+    storeSaved([{ no: o.order_no, phone, at: Date.now() }].concat(loadSaved().filter(x => x.no !== o.order_no)));
+    updateBadge();
+  }
+  function updateBadge() {
+    const n = loadSaved().length, b = $('#my-count');
+    b.textContent = n; b.classList.toggle('hidden', !n);
+  }
+  function orderCard(o) {
+    return '<div class="oc"><div class="oc-top"><b>#' + esc(o.order_no) + '</b><span class="st ' + esc(o.status) + '">' + esc(STATUS[o.status] || o.status) + '</span></div>' +
+      '<div>' + esc(o.product_name) + ' × ' + o.qty + ' · <b>' + inr(o.total) + '</b></div>' +
+      '<small>' + (o.payment_method === 'cod' ? 'Cash on Delivery' : 'Online: ' + (o.payment_status === 'paid' ? 'Payment mil gaya' : 'Payment baaki')) +
+      ' · ' + esc(fmtDay(new Date(o.created_at))) + '</small></div>';
+  }
+  async function openOrders() {
+    openModal('<div class="mh"><h3>📦 Mere Orders</h3><button class="x" data-close type="button">✕</button></div>' +
+      '<div id="mo-list"><p class="mo-note">Dhoondh rahe hain...</p></div>' +
+      '<details class="mo-find"><summary>Purana order nahi dikh raha?</summary>' +
+      '<input id="f-no" placeholder="Order ID (jaise ORD1A2B3C4)"><input id="f-ph" type="tel" inputmode="numeric" placeholder="Order mein daala phone number">' +
+      '<button class="obtn" data-find type="button" style="width:100%">Order dhoondo</button><p id="f-msg" class="mo-note"></p></details>');
+    const saved = loadSaved();
+    const box = $('#mo-list');
+    if (!saved.length) { box.innerHTML = '<p class="mo-note">Abhi tak is phone se koi order nahi kiya.<br>Order karne ke baad wo yahan dikhega.</p>'; return; }
+    const res = await Promise.all(saved.map(x => sb.rpc('track_order', { p_order_no: x.no, p_phone: x.phone }).then(r => r.data || null, () => null)));
+    const html = res.map((o, i) => o ? orderCard(o) :
+      '<div class="oc"><div class="oc-top"><b>#' + esc(saved[i].no) + '</b></div><small>Abhi status nahi mil paya</small></div>').join('');
+    if ($('#mo-list')) $('#mo-list').innerHTML = html;
+  }
+  async function findOrder() {
+    const no = $('#f-no').value.trim(), ph = $('#f-ph').value.replace(/\D/g, '').slice(-10), msg = $('#f-msg');
+    if (!no || ph.length !== 10) { msg.textContent = 'Order ID aur 10 digit phone number dono daalo'; return; }
+    msg.textContent = 'Dhoondh rahe hain...';
     const r = await sb.rpc('track_order', { p_order_no: no, p_phone: ph });
-    if (r.error) { out.textContent = 'Abhi check nahi ho paya, dobara try karo.'; return; }
-    if (!r.data) { out.textContent = 'Is ID aur number se koi order nahi mila.'; return; }
-    const o = r.data;
-    out.innerHTML = '<b>#' + esc(o.order_no) + '</b> · ' + esc(STATUS[o.status] || o.status) + '<br>' +
-      esc(o.product_name) + ' × ' + o.qty + ' · ' + inr(o.total) + '<br>' +
-      (o.payment_method === 'cod' ? 'Cash on Delivery' : 'Online: ' + (o.payment_status === 'paid' ? 'Payment mil gaya' : 'Payment baaki')) +
-      '<br><small style="color:#9fb0d3">Order: ' + esc(fmtDay(new Date(o.created_at))) + '</small>';
+    if (r.error) { msg.textContent = 'Abhi check nahi ho paya, dobara try karo.'; return; }
+    if (!r.data) { msg.textContent = 'Is ID aur number se koi order nahi mila.'; return; }
+    storeSaved([{ no: r.data.order_no, phone: ph, at: Date.now() }].concat(loadSaved().filter(x => x.no !== r.data.order_no)));
+    updateBadge();
+    openOrders();
   }
 
   function bind() {
@@ -241,10 +269,12 @@
     });
     $('#modal').addEventListener('click', e => {
       if (e.target.id === 'modal' || e.target.closest('[data-close]')) closeModal();
+      else if (e.target.closest('[data-find]')) findOrder();
     });
-    $('#t-btn').addEventListener('click', track);
+    $('#myorders').addEventListener('click', openOrders);
+    updateBadge();
   }
 
   init();
 })();
-         
+      
