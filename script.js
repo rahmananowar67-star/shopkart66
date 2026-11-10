@@ -697,6 +697,24 @@
       }
     });
   }
-
+  // ---------- app install (mobile / computer) ----------
+  let installEvt = null;
+  const isStandalone = () => (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; });
+  window.addEventListener('appinstalled', () => { installEvt = null; const b = $('#install'); if (b) b.classList.add('hidden'); toast('App install ho gaya ✓'); });
+  function setupInstall() {
+    const b = $('#install');
+    if (!b || isStandalone()) return;
+    b.classList.remove('hidden');
+    b.addEventListener('click', async () => {
+      if (installEvt) { installEvt.prompt(); try { await installEvt.userChoice; } catch (e) {} installEvt = null; return; }
+      openModal('<div class="card-head"><h3>📲 App install karo</h3><button class="x" data-act="close" type="button">✕</button></div>' +
+        '<p class="empty" style="text-align:left"><b>Android phone (Chrome):</b> upar daayein ⋮ menu dabao, phir "Install app" ya "Add to Home screen".</p>' +
+        '<p class="empty" style="text-align:left"><b>iPhone (Safari):</b> neeche Share (⬆️) dabao, phir "Add to Home Screen".</p>' +
+        '<p class="empty" style="text-align:left"><b>Computer (Chrome/Edge):</b> address bar ke daayein taraf install icon dabao, ya menu mein "Install ShopKart".</p>');
+    });
+  }
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
+  setupInstall();
   init();
 })();
