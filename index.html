@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
+
 <!-- ============ SETUP BAAKI (config.js khali) ============ -->
 <section id="setup" class="auth hidden">
   <div class="auth-card">
@@ -36,6 +37,7 @@
       <label>Password</label>
       <input name="password" type="password" autocomplete="current-password" required>
       <button class="btn block" type="submit">Login</button>
+      <a class="textlink" id="forgot">Password bhul gaye?</a>
     </form>
 
     <form id="form-signup" class="hidden">
@@ -50,6 +52,39 @@
       <small>Naye order is number par WhatsApp se aayenge.</small>
       <button class="btn block" type="submit">Account banao</button>
     </form>
+
+    <form id="form-forgot" class="hidden">
+      <label>Apna registered email</label>
+      <input name="email" type="email" autocomplete="email" required>
+      <button class="btn block" type="submit">Reset link bhejo</button>
+      <a class="textlink" id="forgot-back">← Login par wapas</a>
+    </form>
+
+    <p class="legal"><a href="/terms.html" target="_blank">Terms</a> · <a href="/privacy.html" target="_blank">Privacy</a></p>
+  </div>
+</section>
+
+<!-- ============ NAYA PASSWORD ============ -->
+<section id="recover" class="auth hidden">
+  <div class="auth-card">
+    <h2>Naya password banao</h2>
+    <p id="recover-msg" class="msg hidden"></p>
+    <form id="form-recover">
+      <label>Naya password (kam se kam 6 akshar)</label>
+      <input name="password" type="password" minlength="6" autocomplete="new-password" required>
+      <button class="btn block" type="submit">Password badlo</button>
+    </form>
+  </div>
+</section>
+
+<!-- ============ FREE PLAN KHATAM ============ -->
+<section id="locked" class="auth hidden">
+  <div class="auth-card" style="text-align:center">
+    <div style="font-size:44px">⏳</div>
+    <h2>Aapka free plan khatam ho gaya</h2>
+    <p class="note">Aapka saara data surakshit hai. Dukaan aage chalane ke liye humse email par sampark karo.</p>
+    <a class="btn block" id="locked-mail" href="#">✉️ Email bhejo</a>
+    <button class="btn ghost block" data-act="logout" type="button">Logout</button>
   </div>
 </section>
 
@@ -94,6 +129,7 @@
         </div>
 
         <div class="linkbar" id="linkbar-dash"></div>
+        <div class="planbar hidden" id="planbar"></div>
 
         <div class="stats" id="stats"></div>
 
@@ -190,5 +226,4 @@
 <script src="/config.js"></script>
 <script src="/script.js"></script>
 </body>
-  </html>
-
+</html>
