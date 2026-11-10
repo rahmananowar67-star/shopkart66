@@ -111,3 +111,6 @@ label{display:block;font-size:13px;font-weight:600;margin:12px 0 4px;color:#3340
 .mo-find{margin-top:14px;font-size:14px}
 .mo-find summary{cursor:pointer;color:var(--blue);font-weight:600;padding:6px 0}
 .mo-find input{margin-top:8px}
+
+.foot a{color:inherit;text-decoration:underline}
+     
